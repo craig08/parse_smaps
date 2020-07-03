@@ -63,9 +63,21 @@ def main():
         smaps_file = os.path.abspath(args[0])
     else:
         try:
-            pid = str(check_output(['pidof', ps_name])).strip().split()[0]
-        except:
-            print('pidof failed or no such process[{}]'.format(ps_name))
+            pids = check_output(['pidof', ps_name]).decode().strip().split()
+            if len(pids) > 1:
+                print('There are multiple pids:')
+                for i, p in enumerate(pids):
+                    cmdline_file = '/proc/' + p + '/cmdline'
+                    with open(cmdline_file, 'r') as cmdline:
+                        line = next(cmdline)
+                        print('[{}] {:>8}: {}'.format(i, p, line))
+                num = input('Choose which one process you want (default=0): ')
+                num = int(num) if num != '' else 0
+                pid = pids[num]
+            else:
+                pid = pids[0]
+        except Exception as err:
+            print(err)
             sys.exit(1)
 
         smaps_file = '/proc/' + pid + '/smaps'
