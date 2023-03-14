@@ -11,6 +11,7 @@ from subprocess import check_output
 
 
 def usage():
+    """Print the program usage screen"""
     print(
         """
 usage: parse_smaps.py [-p process_name] [-t memory_type] [-h] [smaps_filename]
