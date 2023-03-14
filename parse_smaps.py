@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Author: Craig Chi <craig10624@gmail.com>
 #
@@ -8,6 +8,7 @@ import os
 import getopt
 from collections import defaultdict, OrderedDict
 from subprocess import check_output
+
 
 def usage():
     print("""
@@ -20,6 +21,7 @@ example: parse_smaps.py /proc/12424/smaps
 
 
 def print_header(mem_idx):
+    """ Print the header of the memory allocation """
     print('=' * 70)
     for title in zip(*map(lambda x: x.split('_'), mem_idx.keys()),
                      ('', '=    Total : library')):
@@ -28,6 +30,7 @@ def print_header(mem_idx):
 
 
 def main():
+    """ main """
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'p:t:ah',
                                    ['process-name=', 'memory-type=',
@@ -68,7 +71,7 @@ def main():
                 print('There are multiple pids:')
                 for i, p in enumerate(pids):
                     cmdline_file = '/proc/' + p + '/cmdline'
-                    with open(cmdline_file, 'r') as cmdline:
+                    with open(cmdline_file, 'r', encoding="latin1") as cmdline:
                         line = next(cmdline)
                         print('[{}] {:>8}: {}'.format(i, p, line))
                 num = input('Choose which one process you want (default=0): ')
@@ -77,7 +80,7 @@ def main():
             else:
                 pid = pids[0]
         except Exception as err:
-            print(err)
+            print(f"Exception occured: {err}")
             sys.exit(1)
 
         smaps_file = '/proc/' + pid + '/smaps'
@@ -85,7 +88,7 @@ def main():
     mapinfo = defaultdict(lambda: [0] * len(mem_idx))
     total = [0] * len(mem_idx)
 
-    with open(smaps_file, 'r') as smap:
+    with open(smaps_file, 'r', encoding="latin1") as smap:
         for line in smap:
             line_arr = line.split()
             if '-' in line_arr[0]:
